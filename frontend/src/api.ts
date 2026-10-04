@@ -124,6 +124,34 @@ export const api = {
     return res.json();
   },
 
+  async downloadPdfReport(projectId: string, projectName: string = 'Report'): Promise<void> {
+    const res = await fetch(`${API_BASE}/projects/${projectId}/export-pdf`);
+    if (!res.ok) throw new Error('Failed to download PDF report');
+    
+    const arrayBuffer = await res.arrayBuffer();
+    const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+    
+    const safeName = projectName.replace(/[^a-zA-Z0-9_-]/g, '_') || 'Project';
+    const fileName = `BlueprintIQ_Report_${safeName}.pdf`;
+    
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = fileName;
+    a.setAttribute('download', fileName);
+    document.body.appendChild(a);
+    a.click();
+    
+    // Allow the browser sufficient time to stream and register the file with the PDF extension
+    setTimeout(() => {
+      if (document.body.contains(a)) {
+        document.body.removeChild(a);
+      }
+      window.URL.revokeObjectURL(url);
+    }, 4000);
+  },
+
   // System & Health
   async getSystemHealth(): Promise<SystemHealth> {
     const res = await fetch(`${API_BASE}/system/health`);

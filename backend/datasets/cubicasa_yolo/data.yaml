@@ -1,0 +1,8 @@
+path: C:/Users/naray/BP-IQ/backend/datasets/cubicasa_yolo
+train: images/train
+val: images/val
+test: images/test
+names:
+  0: wall
+  1: door
+  2: window

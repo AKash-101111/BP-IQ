@@ -3,38 +3,95 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 import io
 import logging
-from typing import List, Dict, Any, Tuple
-from backend.app.models.schemas import IssueItem
+from typing import List, Dict, Any, Tuple, Optional
 
 logger = logging.getLogger("blueprintiq.markup")
 
 class BlueprintMarkupGenerator:
     """
     Renders visual marked-up blueprints with high-contrast bounding boxes,
-    numbered badges [01], [02], translucent region highlights, and legend.
-    Preserves full visual recognizability of the underlying architectural drawing.
+    real YOLO object detections (walls, doors, windows), anomaly badges,
+    translucent region highlights, and legend.
+    Preserves full visual fidelity and coordinate accuracy of the underlying architectural drawing.
     """
 
     @staticmethod
     def generate_marked_blueprint(
         raw_image_bytes: bytes,
-        issues: List[Dict[str, Any]],
+        issues: Optional[List[Dict[str, Any]]] = None,
+        walls: Optional[List[Dict[str, Any]]] = None,
+        openings: Optional[List[Dict[str, Any]]] = None,
+        rooms: Optional[List[Dict[str, Any]]] = None,
         page_number: int = 1
     ) -> bytes:
-        # Load raw image into PIL Image for clean alpha blending and high-res vector drawing
+        issues = issues or []
+        walls = walls or []
+        openings = openings or []
+        rooms = rooms or []
+
+        # Load raw image into PIL Image for clean alpha blending and vector drawing
         base_img = Image.open(io.BytesIO(raw_image_bytes)).convert("RGBA")
         width, height = base_img.size
 
-        # Create overlay for translucent highlights
+        # Overlay for translucent highlights
         overlay = Image.new("RGBA", (width, height), (255, 255, 255, 0))
         draw_overlay = ImageDraw.Draw(overlay)
         draw_solid = ImageDraw.Draw(base_img)
 
-        # Filter issues for this page
-        page_issues = [i for i in issues if i.get("page_number", 1) == page_number and i.get("bbox")]
+        # 1. Draw YOLO Detected Objects (Doors, Windows, Walls)
+        # Class styling
+        detection_styles = {
+            "wall": {"fill": (46, 139, 87, 30), "border": (46, 139, 87, 220), "label_bg": (46, 139, 87, 230)},
+            "door": {"fill": (30, 144, 255, 40), "border": (30, 144, 255, 230), "label_bg": (30, 144, 255, 240)},
+            "window": {"fill": (230, 126, 34, 40), "border": (230, 126, 34, 230), "label_bg": (230, 126, 34, 240)},
+            "room": {"fill": (155, 89, 182, 25), "border": (155, 89, 182, 180), "label_bg": (155, 89, 182, 220)}
+        }
 
-        # Colors matching design guidelines
-        color_map = {
+        # Draw detected walls
+        for w in walls:
+            if w.get("page_number", 1) == page_number and w.get("bbox"):
+                bb = w["bbox"]
+                bx, by, bw, bh = float(bb.get("x", 0)), float(bb.get("y", 0)), float(bb.get("width", 1)), float(bb.get("height", 1))
+                st = detection_styles["wall"]
+                draw_overlay.rectangle([bx, by, bx + bw, by + bh], fill=st["fill"])
+                draw_solid.rectangle([bx, by, bx + bw, by + bh], outline=st["border"], width=2)
+                conf = w.get("confidence")
+                conf_str = f" {int(conf*100)}%" if conf else ""
+                label = f"Wall{conf_str}"
+                # Small label badge
+                draw_solid.rectangle([bx, max(0, by - 14), bx + 55, by], fill=st["label_bg"])
+                draw_solid.text((bx + 3, max(0, by - 13)), label, fill=(255, 255, 255, 255))
+
+        # Draw detected openings (doors and windows)
+        for op in openings:
+            if op.get("page_number", 1) == page_number and op.get("bbox"):
+                bb = op["bbox"]
+                bx, by, bw, bh = float(bb.get("x", 0)), float(bb.get("y", 0)), float(bb.get("width", 1)), float(bb.get("height", 1))
+                op_type = op.get("opening_type", "DOOR").lower()
+                st = detection_styles.get(op_type, detection_styles["door"])
+                draw_overlay.rectangle([bx, by, bx + bw, by + bh], fill=st["fill"])
+                draw_solid.rectangle([bx, by, bx + bw, by + bh], outline=st["border"], width=2)
+                conf = op.get("confidence")
+                conf_str = f" {int(conf*100)}%" if conf else ""
+                label = f"{op_type.capitalize()}{conf_str}"
+                badge_w = 60 if conf else 45
+                draw_solid.rectangle([bx, max(0, by - 14), bx + badge_w, by], fill=st["label_bg"])
+                draw_solid.text((bx + 3, max(0, by - 13)), label, fill=(255, 255, 255, 255))
+
+        # Draw detected rooms (if any)
+        for rm in rooms:
+            if rm.get("page_number", 1) == page_number and rm.get("bbox"):
+                bb = rm["bbox"]
+                bx, by, bw, bh = float(bb.get("x", 0)), float(bb.get("y", 0)), float(bb.get("width", 1)), float(bb.get("height", 1))
+                st = detection_styles["room"]
+                draw_overlay.rectangle([bx, by, bx + bw, by + bh], fill=st["fill"])
+                draw_solid.rectangle([bx, by, bx + bw, by + bh], outline=st["border"], width=1)
+                rname = rm.get("name", "Room")[:18]
+                draw_solid.rectangle([bx, max(0, by - 14), bx + (len(rname) * 7) + 6, by], fill=st["label_bg"])
+                draw_solid.text((bx + 3, max(0, by - 13)), rname, fill=(255, 255, 255, 255))
+
+        # 2. Draw Audit Issues
+        issue_colors = {
             "CRITICAL": {"fill": (196, 61, 61, 70), "border": (196, 61, 61, 255), "badge": (196, 61, 61, 255)},
             "HIGH": {"fill": (196, 61, 61, 60), "border": (196, 61, 61, 255), "badge": (196, 61, 61, 255)},
             "MEDIUM": {"fill": (183, 121, 31, 55), "border": (183, 121, 31, 255), "badge": (183, 121, 31, 255)},
@@ -42,12 +99,13 @@ class BlueprintMarkupGenerator:
             "INFO": {"fill": (47, 107, 79, 45), "border": (47, 107, 79, 255), "badge": (47, 107, 79, 255)},
         }
 
+        page_issues = [i for i in issues if i.get("page_number", 1) == page_number and i.get("bbox")]
         badge_positions = []
 
         for idx, issue in enumerate(page_issues):
-            code_num = f"{idx + 1:02d}" # "01", "02"
+            code_num = f"{idx + 1:02d}"
             severity = issue.get("severity", "MEDIUM")
-            c = color_map.get(severity, color_map["MEDIUM"])
+            c = issue_colors.get(severity, issue_colors["MEDIUM"])
 
             bb = issue["bbox"]
             bx = float(bb.get("x", 100))
@@ -58,45 +116,45 @@ class BlueprintMarkupGenerator:
             x0, y0 = bx, by
             x1, y1 = bx + bw, by + bh
 
-            # 1. Draw translucent highlight rectangle
             draw_overlay.rectangle([x0, y0, x1, y1], fill=c["fill"])
-            
-            # 2. Draw border
             border_w = 3 if severity in ["HIGH", "CRITICAL"] else 2
             draw_solid.rectangle([x0, y0, x1, y1], outline=c["border"], width=border_w)
 
-            # 3. Draw numbered badge circle at top-left corner
-            badge_r = 16
-            cx = max(badge_r, x0 - 8)
-            cy = max(badge_r, y0 - 8)
+            badge_r = 14
+            cx = max(badge_r, x0 - 6)
+            cy = max(badge_r, y0 - 6)
             draw_solid.ellipse([cx - badge_r, cy - badge_r, cx + badge_r, cy + badge_r], fill=c["badge"], outline=(255, 255, 255, 255), width=2)
-            
-            # Badge text
-            draw_solid.text((cx - 8, cy - 8), code_num, fill=(255, 255, 255, 255))
+            draw_solid.text((cx - 7, cy - 6), code_num, fill=(255, 255, 255, 255))
             badge_positions.append((code_num, issue.get("title", ""), severity))
 
         # Composite translucent overlay onto base image
         composed = Image.alpha_composite(base_img, overlay)
         draw_composed = ImageDraw.Draw(composed)
 
-        # 4. Draw Legend Box if issues exist
-        if badge_positions:
-            leg_w = min(420, width - 40)
-            leg_h = 35 + (len(badge_positions) * 24)
-            leg_x = 20
-            leg_y = height - leg_h - 20
+        # 3. Draw Legend Box
+        total_doors = len([op for op in openings if op.get("opening_type") == "DOOR"])
+        total_windows = len([op for op in openings if op.get("opening_type") == "WINDOW"])
+        total_walls = len(walls)
 
-            # Legend background panel
-            draw_composed.rectangle([leg_x, leg_y, leg_x + leg_w, leg_y + leg_h], fill=(255, 255, 255, 240), outline=(217, 221, 227, 255), width=2)
-            draw_composed.text((leg_x + 12, leg_y + 8), "BLUEPRINT AUDIT ANOMALIES & LEGEND", fill=(32, 36, 42, 255))
+        leg_lines = [
+            f"YOLO11n Detections: {total_walls} Walls | {total_doors} Doors | {total_windows} Windows"
+        ]
+        for num, title, sev in badge_positions[:6]:
+            t = (title[:34] + "...") if len(title) > 34 else title
+            leg_lines.append(f"[{num}] {sev}: {t}")
 
-            for i, (num, title, sev) in enumerate(badge_positions):
-                row_y = leg_y + 32 + (i * 22)
-                c = color_map.get(sev, color_map["MEDIUM"])
-                draw_composed.ellipse([leg_x + 12, row_y, leg_x + 28, row_y + 16], fill=c["badge"])
-                draw_composed.text((leg_x + 16, row_y + 1), num, fill=(255, 255, 255, 255))
-                truncated_title = (title[:36] + "...") if len(title) > 36 else title
-                draw_composed.text((leg_x + 36, row_y + 1), f"[{sev}] {truncated_title}", fill=(32, 36, 42, 255))
+        leg_w = min(480, width - 40)
+        leg_h = 24 + (len(leg_lines) * 20)
+        leg_x = 20
+        leg_y = height - leg_h - 20
+
+        # Background panel
+        draw_composed.rectangle([leg_x, leg_y, leg_x + leg_w, leg_y + leg_h], fill=(255, 255, 255, 240), outline=(180, 185, 195, 255), width=2)
+        draw_composed.text((leg_x + 10, leg_y + 5), "BLUEPRINTIQ MARKED-UP ANALYSIS", fill=(20, 24, 30, 255))
+
+        for idx, line in enumerate(leg_lines):
+            row_y = leg_y + 24 + (idx * 18)
+            draw_composed.text((leg_x + 10, row_y), line, fill=(40, 44, 52, 255))
 
         # Convert back to RGB PNG
         final_img = composed.convert("RGB")

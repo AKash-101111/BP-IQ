@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Project, AnalysisReport } from '../../types';
-import { Download, FileText, CheckCircle2, AlertTriangle, ShieldCheck, Printer } from 'lucide-react';
+import { Download, FileText, CheckCircle2, AlertTriangle, ShieldCheck, Printer, Loader2 } from 'lucide-react';
+import { api } from '../../api';
 
 interface ReportsViewProps {
   currentProject: Project | null;
@@ -8,6 +9,8 @@ interface ReportsViewProps {
 }
 
 export const ReportsView: React.FC<ReportsViewProps> = ({ currentProject, report }) => {
+  const [downloading, setDownloading] = useState(false);
+
   if (!currentProject) {
     return (
       <div className="flex-1 p-8 text-center">
@@ -19,6 +22,20 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ currentProject, report
       </div>
     );
   }
+
+  const handleDownload = async () => {
+    if (!currentProject) return;
+    try {
+      setDownloading(true);
+      await api.downloadPdfReport(currentProject.id, currentProject.name);
+    } catch (e) {
+      console.error('Download failed:', e);
+      // Fallback direct link navigation
+      window.open(`/api/projects/${currentProject.id}/export-pdf`, '_blank');
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   return (
     <div className="flex-1 overflow-y-auto p-6 space-y-6">
@@ -38,14 +55,18 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ currentProject, report
             <Printer className="w-3.5 h-3.5 text-textSecondary" />
             <span>Print View</span>
           </button>
-          <a
-            href={`/api/projects/${currentProject.id}/export-pdf`}
-            download
-            className="flex items-center gap-1.5 px-4 py-1.5 rounded bg-accent text-white text-xs font-semibold hover:bg-accent-hover transition-colors shadow-sm"
+          <button
+            onClick={handleDownload}
+            disabled={downloading}
+            className="flex items-center gap-1.5 px-4 py-1.5 rounded bg-accent text-white text-xs font-semibold hover:bg-accent-hover transition-colors shadow-sm disabled:opacity-70"
           >
-            <Download className="w-4 h-4" />
-            <span>Download Official PDF</span>
-          </a>
+            {downloading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Download className="w-4 h-4" />
+            )}
+            <span>{downloading ? 'Preparing PDF...' : 'Download Official PDF'}</span>
+          </button>
         </div>
       </div>
 

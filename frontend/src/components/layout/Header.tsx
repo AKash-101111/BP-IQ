@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Project, Blueprint } from '../../types';
-import { Play, Download, Plus, Scale, AlertCircle, CheckCircle2, HelpCircle } from 'lucide-react';
+import { Play, Download, Plus, Scale, AlertCircle, CheckCircle2, HelpCircle, Loader2 } from 'lucide-react';
+import { api } from '../../api';
 
 interface HeaderProps {
   currentProject: Project | null;
@@ -21,6 +22,20 @@ export const Header: React.FC<HeaderProps> = ({
   isAnalyzing,
   blueprints,
 }) => {
+  const [exporting, setExporting] = useState(false);
+
+  const handleExport = async () => {
+    if (!currentProject) return;
+    try {
+      setExporting(true);
+      await api.downloadPdfReport(currentProject.id, currentProject.name);
+    } catch (e) {
+      console.error('Export failed:', e);
+      window.open(`/api/projects/${currentProject.id}/export-pdf`, '_blank');
+    } finally {
+      setExporting(false);
+    }
+  };
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'ANALYSIS COMPLETE':
@@ -129,14 +144,18 @@ export const Header: React.FC<HeaderProps> = ({
         )}
 
         {currentProject && (
-          <a
-            href={`/api/projects/${currentProject.id}/export-pdf`}
-            download
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium bg-canvas hover:bg-borderline text-textPrimary border border-borderline transition-colors"
+          <button
+            onClick={handleExport}
+            disabled={exporting}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium bg-canvas hover:bg-borderline text-textPrimary border border-borderline transition-colors disabled:opacity-60"
           >
-            <Download className="w-3.5 h-3.5 text-textSecondary" />
-            <span>Export Report</span>
-          </a>
+            {exporting ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-textSecondary" />
+            ) : (
+              <Download className="w-3.5 h-3.5 text-textSecondary" />
+            )}
+            <span>{exporting ? 'Exporting...' : 'Export Report'}</span>
+          </button>
         )}
       </div>
     </header>
