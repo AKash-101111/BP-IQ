@@ -196,21 +196,42 @@ class DatabaseService:
                 from supabase import create_client
                 self.supabase = create_client(settings.SUPABASE_URL, key)
                 self.is_supabase_connected = True
-                logger.info("Connected to remote Supabase database.")
+                logger.info(f"[SUPABASE] Connected to remote Supabase instance at {settings.SUPABASE_URL}")
             except Exception as e:
-                logger.warning(f"Failed to connect to Supabase: {e}. Using local persistent store.")
+                logger.warning(f"[SUPABASE] Failed to connect to Supabase: {e}. Using local persistent store.")
                 self.supabase = None
                 self.is_supabase_connected = False
 
     def insert(self, table: str, record: Dict[str, Any]) -> Dict[str, Any]:
         # Always save to local store for resilience
         res = local_db.insert(table, record)
+        rec_id = record.get("id", "unknown")
+        proj_id = record.get("project_id", record.get("id") if table == "projects" else "N/A")
+        conf = (
+            record.get("overall_confidence") or 
+            (record.get("report_json", {}).get("uncertainty", {}).get("confidence_score") if isinstance(record.get("report_json"), dict) else None) or
+            record.get("confidence") or
+            "N/A"
+        )
+        
         if self.is_supabase_connected and self.supabase:
             try:
                 cleaned = clean_for_supabase(table, record)
-                self.supabase.table(table).upsert(cleaned).execute()
+                sb_res = self.supabase.table(table).upsert(cleaned).execute()
+                logger.info(
+                    f"[SUPABASE INSERT/UPSERT SUCCESS] Table: '{table}' | Record ID: {rec_id} | Project ID: {proj_id} | "
+                    f"Saved Overall Confidence: {conf} | Supabase Rows Affected: {len(sb_res.data) if sb_res.data else 1}"
+                )
             except Exception as e:
-                logger.warning(f"Supabase sync failed for {table}: {e}")
+                logger.error(
+                    f"[SUPABASE INSERT ERROR] Table: '{table}' | Record ID: {rec_id} | Project ID: {proj_id} | "
+                    f"Confidence: {conf} | Supabase Error: {e}"
+                )
+        else:
+            logger.info(
+                f"[LOCAL STORE INSERT] Table: '{table}' | Record ID: {rec_id} | Project ID: {proj_id} | "
+                f"Saved Overall Confidence: {conf}"
+            )
         return res
 
     def get(self, table: str, item_id: str) -> Optional[Dict[str, Any]]:
@@ -218,20 +239,36 @@ class DatabaseService:
             try:
                 resp = self.supabase.table(table).select("*").eq("id", item_id).execute()
                 if resp.data:
+                    logger.debug(f"[SUPABASE GET SUCCESS] Table: '{table}' | ID: {item_id}")
                     return resp.data[0]
             except Exception as e:
-                logger.warning(f"Supabase get failed for {table}: {e}")
+                logger.warning(f"[SUPABASE GET ERROR] Table: '{table}' | ID: {item_id} | Error: {e}")
         return local_db.get(table, item_id)
 
     def update(self, table: str, item_id: str, updates: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         res = local_db.update(table, item_id, updates)
+        proj_id = updates.get("project_id", item_id if table == "projects" else "N/A")
+        conf = updates.get("overall_confidence", updates.get("confidence", "N/A"))
+        
         if self.is_supabase_connected and self.supabase:
             try:
                 cleaned = clean_for_supabase(table, updates)
                 if cleaned:
-                    self.supabase.table(table).update(cleaned).eq("id", item_id).execute()
+                    sb_res = self.supabase.table(table).update(cleaned).eq("id", item_id).execute()
+                    logger.info(
+                        f"[SUPABASE UPDATE SUCCESS] Table: '{table}' | Record ID: {item_id} | Project ID: {proj_id} | "
+                        f"Saved Overall Confidence: {conf} | Supabase Rows Affected: {len(sb_res.data) if sb_res.data else 1}"
+                    )
             except Exception as e:
-                logger.warning(f"Supabase update failed for {table}: {e}")
+                logger.error(
+                    f"[SUPABASE UPDATE ERROR] Table: '{table}' | Record ID: {item_id} | Project ID: {proj_id} | "
+                    f"Confidence: {conf} | Supabase Error: {e}"
+                )
+        else:
+            logger.info(
+                f"[LOCAL STORE UPDATE] Table: '{table}' | Record ID: {item_id} | Project ID: {proj_id} | "
+                f"Saved Overall Confidence: {conf}"
+            )
         return res
 
     def query(self, table: str, filters: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
@@ -256,17 +293,19 @@ class DatabaseService:
                     data = resp.data
                     if filters and len(supabase_filters) < len(filters):
                         data = [item for item in data if filter_fn(item)]
+                    logger.debug(f"[SUPABASE QUERY SUCCESS] Table: '{table}' | Count: {len(data)}")
                     return data
             except Exception as e:
-                logger.warning(f"Supabase query failed for {table}: {e}")
+                logger.warning(f"[SUPABASE QUERY ERROR] Table: '{table}' | Filters: {filters} | Error: {e}")
         return local_db.query(table, filter_fn if filters else None)
 
     def delete(self, table: str, item_id: str) -> bool:
         if self.is_supabase_connected and self.supabase:
             try:
                 self.supabase.table(table).delete().eq("id", item_id).execute()
+                logger.info(f"[SUPABASE DELETE SUCCESS] Table: '{table}' | ID: {item_id}")
             except Exception as e:
-                logger.warning(f"Supabase delete failed: {e}")
+                logger.error(f"[SUPABASE DELETE ERROR] Table: '{table}' | ID: {item_id} | Error: {e}")
         return local_db.delete(table, item_id)
 
 db = DatabaseService()

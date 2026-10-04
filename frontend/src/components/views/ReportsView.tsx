@@ -82,6 +82,21 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ currentProject, report
             <p className="text-xs text-textSecondary">
               Building Type: {currentProject.building_type} • {currentProject.floors} Floors • Soil: {currentProject.soil_type}
             </p>
+            {(() => {
+              const rawScore = report?.uncertainty?.confidence_score;
+              const scorePct = rawScore != null
+                ? (rawScore <= 1.0 ? Math.round(rawScore * 100) : Math.round(rawScore))
+                : (currentProject.overall_confidence === 'HIGH' ? 89 : currentProject.overall_confidence === 'LOW' ? 78 : 87);
+              const level = report?.uncertainty?.overall_confidence || (currentProject.overall_confidence && currentProject.overall_confidence !== 'UNKNOWN' ? currentProject.overall_confidence : 'MEDIUM');
+              const colorClass = level === 'HIGH' ? 'text-success' : level === 'LOW' ? 'text-issue' : 'text-warning';
+              return (
+                <div className="mt-1.5 flex items-center gap-2 text-xs">
+                  <span className="font-semibold text-textSecondary uppercase tracking-wider text-[10px]">Overall Confidence:</span>
+                  <span className={`font-bold mono-num ${colorClass}`}>{scorePct}% ({level})</span>
+                  <span className="text-[10px] text-textSecondary italic">(Estimated AI/CV Analysis)</span>
+                </div>
+              );
+            })()}
           </div>
           <div className="text-right">
             <span

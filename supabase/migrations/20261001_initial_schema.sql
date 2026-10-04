@@ -277,3 +277,47 @@ CREATE INDEX IF NOT EXISTS idx_boq_items_project ON boq_items(project_id);
 CREATE INDEX IF NOT EXISTS idx_material_estimates_project ON material_estimates(project_id);
 CREATE INDEX IF NOT EXISTS idx_issues_project ON issues(project_id);
 CREATE INDEX IF NOT EXISTS idx_rag_chunks_clause ON rag_chunks(clause_ref);
+
+-- RLS Policies
+ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'projects' AND policyname = 'Allow access on projects') THEN
+        CREATE POLICY "Allow access on projects" ON projects FOR ALL USING (true) WITH CHECK (true);
+    END IF;
+END $$;
+
+ALTER TABLE analysis_reports ENABLE ROW LEVEL SECURITY;
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'analysis_reports' AND policyname = 'Allow access on analysis_reports') THEN
+        CREATE POLICY "Allow access on analysis_reports" ON analysis_reports FOR ALL USING (true) WITH CHECK (true);
+    END IF;
+END $$;
+
+ALTER TABLE analysis_runs ENABLE ROW LEVEL SECURITY;
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'analysis_runs' AND policyname = 'Allow access on analysis_runs') THEN
+        CREATE POLICY "Allow access on analysis_runs" ON analysis_runs FOR ALL USING (true) WITH CHECK (true);
+    END IF;
+END $$;
+
+ALTER TABLE boq_items ENABLE ROW LEVEL SECURITY;
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'boq_items' AND policyname = 'Allow access on boq_items') THEN
+        CREATE POLICY "Allow access on boq_items" ON boq_items FOR ALL USING (true) WITH CHECK (true);
+    END IF;
+END $$;
+
+ALTER TABLE material_estimates ENABLE ROW LEVEL SECURITY;
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'material_estimates' AND policyname = 'Allow access on material_estimates') THEN
+        CREATE POLICY "Allow access on material_estimates" ON material_estimates FOR ALL USING (true) WITH CHECK (true);
+    END IF;
+END $$;
+
+ALTER TABLE issues ENABLE ROW LEVEL SECURITY;
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'issues' AND policyname = 'Allow access on issues') THEN
+        CREATE POLICY "Allow access on issues" ON issues FOR ALL USING (true) WITH CHECK (true);
+    END IF;
+END $$;
+

@@ -152,6 +152,7 @@ export const App: React.FC = () => {
         <Header
           currentProject={currentProject}
           projects={projects}
+          report={report}
           onSelectProject={selectProject}
           onOpenNewProjectModal={() => setCurrentTab('create-project')}
           onRunAnalysis={() => setCurrentTab('analysis')}

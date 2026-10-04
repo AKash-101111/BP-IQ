@@ -196,8 +196,9 @@ async def execute_full_pipeline(run_id: str, project_id: str, blueprint_id: str)
     pdf_url, _ = storage.save_report(project_id, pdf_bytes, extension="pdf")
 
     # Save Analysis Report
+    report_id = str(uuid4())
     report_dict = {
-        "id": str(uuid4()),
+        "id": report_id,
         "project_id": project_id,
         "blueprint_id": blueprint_id,
         "summary_text": gemma_reasoning.get("executive_summary", "Analysis completed."),
@@ -225,6 +226,12 @@ async def execute_full_pipeline(run_id: str, project_id: str, blueprint_id: str)
         "status": approval_status,
         "overall_confidence": uncertainty.overall_confidence
     })
+
+    logger.info(
+        f"[PIPELINE COMPLETE] Analysis Run ID: {run_id} | Report ID: {report_id} | Project ID: {project_id} | "
+        f"Saved Overall Confidence: {uncertainty.overall_confidence} ({uncertainty.confidence_score}) | "
+        f"Approval Status: {approval_status}"
+    )
 
 @router.get("/status", response_model=List[AnalysisRunResponse])
 def get_analysis_status(project_id: str):
@@ -334,17 +341,23 @@ def export_pdf(project_id: str):
         boq_items = [b.model_dump() for b in calculated_boq]
         materials = [m.model_dump() for m in calculated_materials]
 
-    uncertainty = uncertainty_engine.evaluate(
-        project, project_metadata,
-        {"rooms_count": len(rooms), "dimensions_count": len(dimensions), "dpi": 150}
-    )
+    # Use persisted uncertainty from saved analysis_reports if available
+    saved_report = reports[-1] if reports else None
+    if saved_report and saved_report.get("report_json", {}).get("uncertainty"):
+        uncertainty_dict = saved_report["report_json"]["uncertainty"]
+    else:
+        uncertainty_obj = uncertainty_engine.evaluate(
+            project, project_metadata,
+            {"rooms_count": len(rooms), "dimensions_count": len(dimensions), "dpi": 150}
+        )
+        uncertainty_dict = uncertainty_obj.model_dump()
 
     rag_refs = []
     rag_refs.extend(rag_engine.search("habitable room area width ceiling height", limit=2))
     rag_refs.extend(rag_engine.search("concrete mortar brickwork deductions", limit=2))
 
-    if reports and reports[-1].get("report_json", {}).get("gemma_reasoning"):
-        gemma_reasoning = reports[-1]["report_json"]["gemma_reasoning"]
+    if saved_report and saved_report.get("report_json", {}).get("gemma_reasoning"):
+        gemma_reasoning = saved_report["report_json"]["gemma_reasoning"]
     else:
         gemma_reasoning = {
             "model_used": "Gemma 2B (Ollama)",
@@ -358,7 +371,7 @@ def export_pdf(project_id: str):
         boq_items=boq_items,
         materials=materials,
         issues=issues,
-        uncertainty=uncertainty.model_dump(),
+        uncertainty=uncertainty_dict,
         rag_references=rag_refs,
         gemma_reasoning=gemma_reasoning
     )

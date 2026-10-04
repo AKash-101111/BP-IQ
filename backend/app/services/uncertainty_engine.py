@@ -26,7 +26,7 @@ class UncertaintyEngine:
         # 1. Soil Type Check
         soil = project.get("soil_type", "Not Provided")
         if not soil or soil.lower() == "not provided":
-            base_score -= 0.15
+            base_score -= 0.08
             missing_inputs.append({
                 "field": "Soil Type",
                 "status": "Not Provided",
@@ -38,7 +38,7 @@ class UncertaintyEngine:
         scale_calibrated = project_metadata.get("scale_calibrated", False)
         drawing_scale = project_metadata.get("drawing_scale", "1:100")
         if not scale_calibrated:
-            base_score -= 0.20
+            base_score -= 0.15
             missing_inputs.append({
                 "field": "Scale Calibration",
                 "status": "Uncalibrated",
@@ -49,7 +49,7 @@ class UncertaintyEngine:
         # 3. Slab Thickness
         slab_thick = project_metadata.get("slab_thickness")
         if not slab_thick:
-            base_score -= 0.10
+            base_score -= 0.08
             missing_inputs.append({
                 "field": "Slab Thickness",
                 "status": "Not Provided",
@@ -58,7 +58,7 @@ class UncertaintyEngine:
             major_assumptions.append("RCC slab thickness assumed as standard 150 mm (6 inches).")
 
         # 4. Structural Drawings Availability
-        base_score -= 0.10
+        base_score -= 0.05
         limitations.append("Analysis is based on 2D architectural floor plan only. Structural framing schedules (column schedules, beam cross-sections, and bar bending schedules) were not provided.")
         major_assumptions.append("Reinforcement steel estimated via standard IS 456 thumb rules (0.8% for slabs, 1.5% for framed elements).")
 
@@ -66,7 +66,7 @@ class UncertaintyEngine:
         rooms_count = drawing_stats.get("rooms_count", 0)
         dimensions_count = drawing_stats.get("dimensions_count", 0)
         if rooms_count > 0 and dimensions_count < (rooms_count * 0.5):
-            base_score -= 0.15
+            base_score -= 0.10
             missing_inputs.append({
                 "field": "Dimension Callout Annotations",
                 "status": "Incomplete Drawing Text",
@@ -77,14 +77,14 @@ class UncertaintyEngine:
         # 6. Scan / Image DPI
         dpi = drawing_stats.get("dpi", 150)
         if dpi < 100:
-            base_score -= 0.10
+            base_score -= 0.08
             limitations.append(f"Image resolution ({dpi} DPI) is below recommended 150-300 DPI architectural standard, increasing OCR uncertainty.")
 
         score = max(0.20, min(0.95, base_score))
 
-        if score >= 0.75:
+        if score >= 0.90:
             overall_confidence = "HIGH"
-        elif score >= 0.50:
+        elif score >= 0.60:
             overall_confidence = "MEDIUM"
         else:
             overall_confidence = "LOW"

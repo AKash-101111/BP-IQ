@@ -15,10 +15,10 @@
       "climate_info": "Warm Humid",
       "seismic_zone": "Zone III",
       "local_authority": "Municipal Development Authority",
-      "status": "REVIEW REQUIRED",
+      "status": "ANALYSIS COMPLETE",
       "overall_confidence": "MEDIUM",
       "created_at": "2026-10-01T05:54:45.780150",
-      "updated_at": "2026-10-01T05:54:45.780150"
+      "updated_at": "2026-10-04T14:49:29.042157"
     },
     "eda1cee1-294d-4ecf-b1e1-93a4f2d842be": {
       "id": "eda1cee1-294d-4ecf-b1e1-93a4f2d842be",
@@ -1024,7 +1024,7 @@
       "height": 1275,
       "dpi": 150,
       "created_at": "2026-10-01T05:54:45.780150",
-      "updated_at": "2026-10-01T05:54:46.082385"
+      "updated_at": "2026-10-04T14:49:28.575825"
     },
     "5d0db4df-9e12-4250-b79c-b2a87ab7f593": {
       "id": "5d0db4df-9e12-4250-b79c-b2a87ab7f593",
@@ -21025,6 +21025,114 @@
       "uncertainty_reasons": [],
       "created_at": "2026-10-04T13:18:40.353912",
       "updated_at": "2026-10-04T13:18:40.353912"
+    },
+    "f0109daa-05a0-4873-b64c-d2d668a43c0f": {
+      "id": "f0109daa-05a0-4873-b64c-d2d668a43c0f",
+      "project_id": "11111111-2222-3333-4444-555555555555",
+      "category": "EARTHWORK",
+      "item_code": "CIV-01",
+      "item_name": "Earthwork excavation in foundation trenches",
+      "estimated_quantity": 434.52,
+      "unit": "m\u00b3",
+      "range_min": 304.16,
+      "range_max": 630.05,
+      "confidence": "LOW",
+      "calculation_basis": "Trench length 379.4m x width 0.83m x depth 1.2m + 15% pits",
+      "assumptions": "Soil type not provided; depth assumed standard 1.2m without soil strata confirmation.",
+      "uncertainty_reasons": [
+        "Soil type was Not Provided in project metadata. Strata depth may vary significantly."
+      ],
+      "created_at": "2026-10-04T14:48:46.062910",
+      "updated_at": "2026-10-04T14:48:46.062910"
+    },
+    "dad4767c-c05f-4ce7-a234-4ffcd8b2487a": {
+      "id": "dad4767c-c05f-4ce7-a234-4ffcd8b2487a",
+      "project_id": "11111111-2222-3333-4444-555555555555",
+      "category": "CONCRETE",
+      "item_code": "CIV-02",
+      "item_name": "Plain Cement Concrete (PCC 1:4:8) in foundation bed (100mm)",
+      "estimated_quantity": 31.49,
+      "unit": "m\u00b3",
+      "range_min": 28.34,
+      "range_max": 36.21,
+      "confidence": "MEDIUM",
+      "calculation_basis": "Footprint trench bed 379.4m x 0.83m x 0.10m thickness",
+      "assumptions": "Nominal 100mm mud mat under footings to IS 456.",
+      "uncertainty_reasons": [],
+      "created_at": "2026-10-04T14:48:46.210187",
+      "updated_at": "2026-10-04T14:48:46.210187"
+    },
+    "8478b9bd-521a-420a-b4ff-0f09b93ff94e": {
+      "id": "8478b9bd-521a-420a-b4ff-0f09b93ff94e",
+      "project_id": "11111111-2222-3333-4444-555555555555",
+      "category": "CONCRETE",
+      "item_code": "CIV-03",
+      "item_name": "Reinforced Cement Concrete (M20) for Slabs, Beams, Columns",
+      "estimated_quantity": 69.12,
+      "unit": "m\u00b3",
+      "range_min": 63.59,
+      "range_max": 77.41,
+      "confidence": "MEDIUM",
+      "calculation_basis": "Slabs (54.0m\u00b3) + Frame elements (~28% of slab volume = 15.12m\u00b3)",
+      "assumptions": "Slab thickness 150.0mm; Framed structure assumed with standard column/beam sizing.",
+      "uncertainty_reasons": [
+        "Structural drawings / beam sizes not detailed on 2D architectural floor plan; thumb rules applied."
+      ],
+      "created_at": "2026-10-04T14:48:46.325860",
+      "updated_at": "2026-10-04T14:48:46.325860"
+    },
+    "204ee7aa-9a81-4643-b001-be666172f675": {
+      "id": "204ee7aa-9a81-4643-b001-be666172f675",
+      "project_id": "11111111-2222-3333-4444-555555555555",
+      "category": "MASONRY",
+      "item_code": "CIV-04",
+      "item_name": "Brick Masonry in Cement Mortar (1:6) with Modular Bricks",
+      "estimated_quantity": 564.76,
+      "unit": "m\u00b3",
+      "range_min": 508.28,
+      "range_max": 621.24,
+      "confidence": "HIGH",
+      "calculation_basis": "Gross wall volume (566.52m\u00b3) minus opening deductions (1.76m\u00b3)",
+      "assumptions": "Ext walls 230.0mm, Int walls 115.0mm. Direct vector wall geometry (30 wall segments).",
+      "uncertainty_reasons": [
+        "Wall centerline geometry calibrated from drawing."
+      ],
+      "created_at": "2026-10-04T14:48:46.429861",
+      "updated_at": "2026-10-04T14:48:46.429861"
+    },
+    "416fe5d4-f31d-4a2f-92ec-e8af43f8493c": {
+      "id": "416fe5d4-f31d-4a2f-92ec-e8af43f8493c",
+      "project_id": "11111111-2222-3333-4444-555555555555",
+      "category": "FINISHES",
+      "item_code": "CIV-05",
+      "item_name": "Cement Plastering (12mm Internal 1:6 + 18mm External 1:4)",
+      "estimated_quantity": 5285.9,
+      "unit": "m\u00b2",
+      "range_min": 4915.89,
+      "range_max": 5814.49,
+      "confidence": "MEDIUM",
+      "calculation_basis": "Internal (3013.8m\u00b2) + External (2272.1m\u00b2) to IS 1200 rules",
+      "assumptions": "IS 1200 deduction rules applied for openings; jambs/soffits accounted for.",
+      "uncertainty_reasons": [],
+      "created_at": "2026-10-04T14:48:46.552230",
+      "updated_at": "2026-10-04T14:48:46.552230"
+    },
+    "2fbbaa1e-8a3a-4451-bee0-87efc7af12c3": {
+      "id": "2fbbaa1e-8a3a-4451-bee0-87efc7af12c3",
+      "project_id": "11111111-2222-3333-4444-555555555555",
+      "category": "FINISHES",
+      "item_code": "CIV-06",
+      "item_name": "Flooring with Vitrified Tiles including 8% wastage",
+      "estimated_quantity": 34.67,
+      "unit": "m\u00b2",
+      "range_min": 32.93,
+      "range_max": 37.44,
+      "confidence": "HIGH",
+      "calculation_basis": "Net room carpet area (32.1m\u00b2) + 8% cutting and layout allowance",
+      "assumptions": "Rectangular layout with standard skirting.",
+      "uncertainty_reasons": [],
+      "created_at": "2026-10-04T14:48:46.676266",
+      "updated_at": "2026-10-04T14:48:46.676266"
     }
   },
   "material_estimates": {
@@ -27327,6 +27435,111 @@
       "assumptions": "1 coat primer + 2 coats premium acrylic emulsion.",
       "created_at": "2026-10-04T13:18:41.548608",
       "updated_at": "2026-10-04T13:18:41.548608"
+    },
+    "bc923912-7a4f-4177-86a6-5f786e38520f": {
+      "id": "bc923912-7a4f-4177-86a6-5f786e38520f",
+      "project_id": "11111111-2222-3333-4444-555555555555",
+      "material_name": "Cement (OPC/PPC 50kg Bags)",
+      "estimated_quantity": 2152.0,
+      "unit": "bags",
+      "range_min": 1980.0,
+      "range_max": 2367.0,
+      "confidence": "MEDIUM",
+      "calculation_basis": "Concrete (557.4 bags) + Masonry (1019.8 bags) + Plaster (574.6 bags)",
+      "formula_ref": "IS 456 Table 9 & IS 2212 Mortar Constants",
+      "assumptions": "Dry volume factor 1.54 for concrete; 1.33 for mortar; cement density 1440 kg/m\u00b3.",
+      "created_at": "2026-10-04T14:48:46.780935",
+      "updated_at": "2026-10-04T14:48:46.780935"
+    },
+    "6d287a5e-483a-4c72-932a-9c57c69906c6": {
+      "id": "6d287a5e-483a-4c72-932a-9c57c69906c6",
+      "project_id": "11111111-2222-3333-4444-555555555555",
+      "material_name": "River Sand / M-Sand",
+      "estimated_quantity": 336.8,
+      "unit": "m\u00b3",
+      "range_min": 303.1,
+      "range_max": 377.2,
+      "confidence": "MEDIUM",
+      "calculation_basis": "Concrete (29.0m\u00b3) + Masonry (212.5m\u00b3) + Plaster (95.3m\u00b3)",
+      "formula_ref": "IS 456 & IS 1200 Part 12",
+      "assumptions": "Includes 10% wastage allowance during screening and handling.",
+      "created_at": "2026-10-04T14:48:46.884576",
+      "updated_at": "2026-10-04T14:48:46.884576"
+    },
+    "9a38ba91-0cb5-432b-bc0a-fc58e079f64a": {
+      "id": "9a38ba91-0cb5-432b-bc0a-fc58e079f64a",
+      "project_id": "11111111-2222-3333-4444-555555555555",
+      "material_name": "Coarse Aggregate (20mm & 10mm Graded)",
+      "estimated_quantity": 84.8,
+      "unit": "m\u00b3",
+      "range_min": 76.3,
+      "range_max": 93.3,
+      "confidence": "MEDIUM",
+      "calculation_basis": "RCC Concrete (58.1m\u00b3) + PCC Bed (26.8m\u00b3)",
+      "formula_ref": "IS 456 Nominal Mix Proportions",
+      "assumptions": "Well graded 20mm down crushed stone aggregate.",
+      "created_at": "2026-10-04T14:48:47.007430",
+      "updated_at": "2026-10-04T14:48:47.007430"
+    },
+    "3ce7f381-ad07-4583-9829-cfb1bd9f4dca": {
+      "id": "3ce7f381-ad07-4583-9829-cfb1bd9f4dca",
+      "project_id": "11111111-2222-3333-4444-555555555555",
+      "material_name": "Modular Clay / Fly Ash Bricks",
+      "estimated_quantity": 296499.0,
+      "unit": "nos",
+      "range_min": 272779.0,
+      "range_max": 326149.0,
+      "confidence": "HIGH",
+      "calculation_basis": "564.76 m\u00b3 net masonry x 500 bricks/m\u00b3 + 5% breakage allowance",
+      "formula_ref": "IS 2212 Brickwork Standards",
+      "assumptions": "Standard modular brick size 190mm x 90mm x 90mm with 10mm joints.",
+      "created_at": "2026-10-04T14:48:47.127933",
+      "updated_at": "2026-10-04T14:48:47.127933"
+    },
+    "99f614f6-e86c-4e55-9a0c-65199b79ed04": {
+      "id": "99f614f6-e86c-4e55-9a0c-65199b79ed04",
+      "project_id": "11111111-2222-3333-4444-555555555555",
+      "material_name": "Reinforcement Steel (Fe500 TMT Rebars)",
+      "estimated_quantity": 5172.0,
+      "unit": "kg",
+      "range_min": 4396.0,
+      "range_max": 6464.0,
+      "confidence": "MEDIUM",
+      "calculation_basis": "Slabs (3391.0 kg at 0.8% vol) + Beams/Columns (1780.0 kg at 1.5% vol)",
+      "formula_ref": "IS 456 Clause 26.5 Standard Thumb Rules",
+      "assumptions": "Steel density 7850 kg/m\u00b3. Actual quantity subject to bar bending schedule (BBS) verification.",
+      "created_at": "2026-10-04T14:48:47.247746",
+      "updated_at": "2026-10-04T14:48:47.247746"
+    },
+    "25caa441-81a1-4a3a-80b5-d6479ef21bdc": {
+      "id": "25caa441-81a1-4a3a-80b5-d6479ef21bdc",
+      "project_id": "11111111-2222-3333-4444-555555555555",
+      "material_name": "Vitrified Floor Tiles (600x600mm)",
+      "estimated_quantity": 34.7,
+      "unit": "m\u00b2",
+      "range_min": 32.9,
+      "range_max": 38.1,
+      "confidence": "HIGH",
+      "calculation_basis": "Net floor area 32.1m\u00b2 + 8% cutting and breakage allowance",
+      "formula_ref": "IS 1200 Part 11 Flooring",
+      "assumptions": "Standard straight bond installation.",
+      "created_at": "2026-10-04T14:48:47.380931",
+      "updated_at": "2026-10-04T14:48:47.380931"
+    },
+    "0d22e375-1308-4d9a-ab8f-67806ea77817": {
+      "id": "0d22e375-1308-4d9a-ab8f-67806ea77817",
+      "project_id": "11111111-2222-3333-4444-555555555555",
+      "material_name": "Emulsion Paint & Primer (2 Coats)",
+      "estimated_quantity": 564.6,
+      "unit": "litres",
+      "range_min": 508.1,
+      "range_max": 649.3,
+      "confidence": "MEDIUM",
+      "calculation_basis": "Total plaster & ceiling area 5645.9m\u00b2 / coverage 10 m\u00b2/Litre",
+      "formula_ref": "Standard Manufacturer Coverage Specification",
+      "assumptions": "1 coat primer + 2 coats premium acrylic emulsion.",
+      "created_at": "2026-10-04T14:48:47.506969",
+      "updated_at": "2026-10-04T14:48:47.506969"
     }
   },
   "issues": {
@@ -32675,6 +32888,60 @@
       "verification_required": true,
       "created_at": "2026-10-04T13:18:43.360821",
       "updated_at": "2026-10-04T13:18:43.360821"
+    },
+    "cd7918c9-3013-4793-abb2-2abb1dcd46bd": {
+      "id": "cd7918c9-3013-4793-abb2-2abb1dcd46bd",
+      "project_id": "11111111-2222-3333-4444-555555555555",
+      "issue_code": "ISSUE-001",
+      "issue_type": "CODE_CONSIDERATION",
+      "severity": "MEDIUM",
+      "page_number": 1,
+      "title": "Potential Habitable Area Constraint: LIVING & DINING",
+      "description": "Room area of 3.8 m\u00b2 is below the standard habitable room recommendation of 9.5 m\u00b2 (approx 102 sq.ft).",
+      "evidence": "Measured area: 3.8 m\u00b2 vs Recommended threshold: 9.5 m\u00b2",
+      "detected_value": "3.8 m\u00b2",
+      "expected_value": ">= 9.5 m\u00b2",
+      "difference_pct": 60.0,
+      "bbox": {
+        "x": 250.83333333333337,
+        "y": 269.9166742960612,
+        "width": 322.79998779296875,
+        "height": 134.42500432332355
+      },
+      "confidence": "HIGH",
+      "source": "RAG-verified National Building Code Clause 4.2.1",
+      "rag_reference": "NBC 2016 Part 3 Clause 4.2.1 (Minimum Habitable Room Area)",
+      "recommendation": "Review room layout with a licensed architect to confirm local municipal development control guidelines.",
+      "verification_required": true,
+      "created_at": "2026-10-04T14:48:47.699442",
+      "updated_at": "2026-10-04T14:48:47.699442"
+    },
+    "fbf5791d-2787-4099-8dd0-db45bec13d93": {
+      "id": "fbf5791d-2787-4099-8dd0-db45bec13d93",
+      "project_id": "11111111-2222-3333-4444-555555555555",
+      "issue_code": "ISSUE-002",
+      "issue_type": "MISSING_INFORMATION",
+      "severity": "MEDIUM",
+      "page_number": 1,
+      "title": "Staircase Riser and Tread Detail Missing on 2D Plan",
+      "description": "Stair flight boundary detected, but specific riser height (e.g. 150-180mm) and tread depth (>=250mm) schedules are unannotated on this plan.",
+      "evidence": "No textual riser/tread callouts (e.g. '18 Risers @ 165mm') identified in staircase zone.",
+      "detected_value": "Unannotated",
+      "expected_value": "Riser <= 190mm, Tread >= 250mm",
+      "difference_pct": null,
+      "bbox": {
+        "x": 834.1666666666667,
+        "y": 647.145856221517,
+        "width": 252.4124654134115,
+        "height": 131.55625661214196
+      },
+      "confidence": "MEDIUM",
+      "source": "Plan Completeness Audit",
+      "rag_reference": "IBC Section 1011.5.2 & NBC 4.8.1",
+      "recommendation": "Request sectional drawing / stair detailing schedule for precise concrete and reinforcement calculation.",
+      "verification_required": true,
+      "created_at": "2026-10-04T14:48:47.830521",
+      "updated_at": "2026-10-04T14:48:47.830521"
     }
   },
   "analysis_runs": {
@@ -38340,6 +38607,58 @@
       },
       "created_at": "2026-10-04T13:19:45.942547",
       "updated_at": "2026-10-04T13:19:45.942547"
+    },
+    "f57731a6-635d-4835-9b69-55719720b79a": {
+      "id": "f57731a6-635d-4835-9b69-55719720b79a",
+      "project_id": "11111111-2222-3333-4444-555555555555",
+      "blueprint_id": "bbbbbbbb-1111-2222-3333-444444444444",
+      "summary_text": "Concise engineering analysis of the drawing completeness and geometry",
+      "approval_status": "ANALYSIS COMPLETE",
+      "pdf_path": "/storage/reports/report_11111111-2222-3333-4444-555555555555.pdf",
+      "report_json": {
+        "gemma_reasoning": {
+          "executive_summary": "Concise engineering analysis of the drawing completeness and geometry",
+          "issue_explanations": [
+            {
+              "issue_code": "ISSUE-001",
+              "synthesis": "Explanation comparing blueprint evidence with the standard clause",
+              "recommended_action": "Specific professional action"
+            }
+          ],
+          "uncertainty_assessment": "Clear explanation of how missing parameters affect accuracy",
+          "professional_verification_notice": "BlueprintIQ provides preliminary automated analysis. Professional architectural and structural verification is required to ensure the accuracy of the drawing and its compliance with building regulations."
+        },
+        "uncertainty": {
+          "overall_confidence": "MEDIUM",
+          "confidence_score": 0.87,
+          "missing_inputs": [
+            {
+              "field": "Soil Type",
+              "status": "Not Provided",
+              "impact": "Foundation trench excavation, footing depth, and sub-base quantities cannot be verified without soil bearing capacity (SBC)."
+            }
+          ],
+          "major_assumptions": [
+            "Excavation depth assumed at nominal 1.2m for medium dense soil; footing sizes subject to soil report.",
+            "Reinforcement steel estimated via standard IS 456 thumb rules (0.8% for slabs, 1.5% for framed elements)."
+          ],
+          "limitations": [
+            "Analysis is based on 2D architectural floor plan only. Structural framing schedules (column schedules, beam cross-sections, and bar bending schedules) were not provided."
+          ]
+        },
+        "summary_metrics": {
+          "carpet_area": 32.1,
+          "builtup_area": 180.0,
+          "total_wall_length": 441.68,
+          "net_masonry_volume": 564.76,
+          "total_rcc_volume": 69.12,
+          "total_cement_bags": 2152,
+          "total_bricks": 296499,
+          "total_steel_kg": 5172
+        }
+      },
+      "created_at": "2026-10-04T14:49:28.866856",
+      "updated_at": "2026-10-04T14:49:28.866856"
     }
   },
   "user_assumptions": {}

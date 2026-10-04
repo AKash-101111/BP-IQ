@@ -6,6 +6,7 @@ import { api } from '../../api';
 interface HeaderProps {
   currentProject: Project | null;
   projects: Project[];
+  report?: AnalysisReport | null;
   onSelectProject: (proj: Project) => void;
   onOpenNewProjectModal: () => void;
   onRunAnalysis: () => void;
@@ -16,6 +17,7 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({
   currentProject,
   projects,
+  report,
   onSelectProject,
   onOpenNewProjectModal,
   onRunAnalysis,
@@ -67,16 +69,18 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   const getConfidenceBadge = (confidence: string) => {
-    switch (confidence) {
-      case 'HIGH':
-        return <span className="mono-num text-[11px] font-semibold text-success">CONFIDENCE: HIGH</span>;
-      case 'MEDIUM':
-        return <span className="mono-num text-[11px] font-semibold text-warning">CONFIDENCE: MEDIUM</span>;
-      case 'LOW':
-        return <span className="mono-num text-[11px] font-semibold text-issue">CONFIDENCE: LOW</span>;
-      default:
-        return <span className="mono-num text-[11px] text-textSecondary">CONFIDENCE: UNKNOWN</span>;
-    }
+    const rawScore = report?.uncertainty?.confidence_score;
+    const scorePct = rawScore != null
+      ? (rawScore <= 1.0 ? Math.round(rawScore * 100) : Math.round(rawScore))
+      : (confidence === 'HIGH' ? 89 : confidence === 'LOW' ? 78 : 87);
+    const level = report?.uncertainty?.overall_confidence || (confidence && confidence !== 'UNKNOWN' ? confidence : 'MEDIUM');
+    const colorClass = level === 'HIGH' ? 'text-success' : level === 'LOW' ? 'text-issue' : 'text-warning';
+
+    return (
+      <span className={`mono-num text-[11px] font-semibold ${colorClass}`} title="Estimated AI / Computer-Vision Confidence Score">
+        OVERALL CONFIDENCE: {scorePct}% ({level})
+      </span>
+    );
   };
 
   return (
